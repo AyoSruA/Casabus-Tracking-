@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fin Tobis</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root { --bg-color: #0f172a; --card-bg: #1e293b; --accent: #0284c7; --accent-hover: #0369a1; --text-main: #f8fafc; --text-sub: #94a3b8; --border: #334155; }
+body { font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif; -webkit-font-smoothing: antialiased; background-color: var(--bg-color); color: var(--text-main); display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 20px; }
+.container { background-color: var(--card-bg); border: 1px solid var(--border); border-radius: 16px; padding: 32px; max-width: 500px; width: 100%; box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
+h2 { margin: 0; font-size: 1.35rem; font-weight: 700; letter-spacing: -0.02em; }
+.logo { font-size: 1.5rem; font-weight: 800; letter-spacing: -0.03em; }
+.logo span { color: #38bdf8; }
+.header { display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); padding-bottom: 16px; margin-bottom: 24px; }
+.badge { background-color: #0284c722; color: #38bdf8; border: 1px solid #0284c755; padding: 4px 10px; border-radius: 12px; font-size: 0.85rem; font-weight: 600; }
+.route-info { font-size: 0.95rem; color: var(--text-sub); margin-bottom: 20px; }
+.route-info strong { color: var(--text-main); }
+.eta-box { background: linear-gradient(135deg, #0284c722 0%, #0369a133 100%); border: 1px solid #0284c766; border-radius: 12px; padding: 20px; text-align: center; margin-bottom: 20px; }
+.eta-time { font-size: 2.2rem; font-weight: 800; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; color: #f0f9ff; }
+.metric-label { font-size: 0.8rem; color: var(--text-sub); text-transform: uppercase; letter-spacing: 0.05em; }
+.adjacent-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+.bus-card { background: #0f172a88; border: 1px solid var(--border); border-radius: 12px; padding: 14px; text-align: center; }
+.bus-card-title { font-size: 0.75rem; color: var(--text-sub); text-transform: uppercase; font-weight: 600; margin-bottom: 6px; }
+.bus-card-val { font-size: 1.1rem; font-weight: 700; font-variant-numeric: tabular-nums; color: #38bdf8; }
+.bus-card-sub { font-size: 0.75rem; color: var(--text-sub); margin-top: 4px; }
+.selectors { display: grid; gap: 12px; margin-bottom: 22px; }
+select { width: 100%; appearance: none; -webkit-appearance: none; -moz-appearance: none; color-scheme: dark; background-color: #0f172a; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2338bdf8' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; background-size: 16px; color: var(--text-main); border: 1px solid var(--border); border-radius: 12px; padding: 13px 42px 13px 16px; font-family: inherit; font-size: 0.95rem; font-weight: 500; text-overflow: ellipsis; cursor: pointer; transition: border-color 0.2s, box-shadow 0.2s, background-color 0.2s; }
+select:hover { border-color: #475569; background-color: #111c33; }
+select:focus { outline: none; border-color: #38bdf8; box-shadow: 0 0 0 3px #38bdf833; }
+select option { background-color: #0f172a; color: var(--text-main); }
+select:disabled { opacity: 0.45; cursor: progress; }
+button { width: 100%; background-color: var(--accent); color: white; border: none; border-radius: 12px; padding: 14px; font-family: inherit; font-size: 1rem; font-weight: 600; cursor: pointer; transition: background 0.2s; }
+button:hover { background-color: var(--accent-hover); }
+.usage { background: #0f172a88; border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; margin-bottom: 12px; }
+.usage-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px; }
+.usage-label { font-size: 0.75rem; font-weight: 600; color: var(--text-sub); text-transform: uppercase; letter-spacing: 0.05em; }
+.usage-count { display: inline-block; transform-origin: right center; font-size: 1.05rem; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--text-main); }
+.usage-sep, .usage-limit { font-weight: 500; color: var(--text-sub); }
+.usage-sep { margin: 0 3px; }
+.usage-bar { height: 6px; background: var(--border); border-radius: 999px; overflow: hidden; }
+.usage-fill { height: 100%; width: 0; border-radius: 999px; background: linear-gradient(90deg, #0284c7, #38bdf8); transition: width 0.5s ease; }
+.usage-fill.warn { background: linear-gradient(90deg, #d97706, #fbbf24); }
+.usage-fill.danger { background: linear-gradient(90deg, #dc2626, #f87171); }
+.usage-left { font-size: 0.75rem; color: var(--text-sub); margin-top: 8px; }
+.usage.bump .usage-count { animation: usage-bump 0.45s ease; }
+@keyframes usage-bump { 0% { transform: scale(1); } 40% { transform: scale(1.18); color: #38bdf8; } 100% { transform: scale(1); } }
+.line-status { display: flex; align-items: center; gap: 8px; min-height: 20px; margin: -10px 0 18px; font-size: 0.8rem; color: var(--text-sub); }
+.line-status.error { color: #fca5a5; }
+.line-status .retry { width: auto; padding: 4px 10px; border-radius: 8px; font-size: 0.75rem; background-color: #334155; }
+.line-status .retry:hover { background-color: #475569; }
+.spinner { width: 13px; height: 13px; flex: none; border: 2px solid #38bdf833; border-top-color: #38bdf8; border-radius: 50%; animation: spin 0.7s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .spinner { animation-duration: 2s; } }
+.results { transition: opacity 0.2s; }
+.results.dim { opacity: 0.35; pointer-events: none; }
+.footer { font-size: 0.75rem; color: var(--text-sub); text-align: center; margin-top: 16px; }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header"><h2 class="logo">Fin <span>Tobis</span></h2><span class="badge" id="status-badge">Saved State</span></div>
+  <div class="selectors">
+    <select id="line-select" aria-label="Line"></select>
+    <select id="direction-select" aria-label="Direction"></select>
+    <select id="station-select" aria-label="Station"></select>
+  </div>
+  <div id="line-status" class="line-status" role="status" aria-live="polite"></div>
+  <div class="results" id="results">
+    <div class="route-info">
+      <div id="route-info"><strong>From:</strong> -- &rarr; <strong>To:</strong> --</div>
+      <div id="timetable-note" class="bus-card-sub" style="display:none"></div>
+    </div>
+    <div class="eta-box">
+      <div class="metric-label">Nearest Bus ETA</div>
+      <div id="eta-time" class="eta-time">--:--:--</div>
+      <div class="bus-card-sub" id="main-dep-info">Departure: --:-- | Arrives in: -- min</div>
+    </div>
+    <div class="adjacent-grid">
+      <div class="bus-card"><div class="bus-card-title">Previous Bus</div><div id="prev-eta" class="bus-card-val">--:--:--</div><div id="prev-dep" class="bus-card-sub">Departure: --:--</div></div>
+      <div class="bus-card"><div class="bus-card-title">Next Bus</div><div id="next-eta" class="bus-card-val">--:--:--</div><div id="next-dep" class="bus-card-sub">Departure: --:--</div></div>
+    </div>
+  </div>
+  <div class="usage" id="usage">
+    <div class="usage-row"><span class="usage-label">HERE requests today</span><span class="usage-count"><span id="usage-used">--</span><span class="usage-sep">/</span><span class="usage-limit" id="usage-limit">--</span></span></div>
+    <div class="usage-bar"><div class="usage-fill" id="usage-fill"></div></div>
+    <div class="usage-left" id="usage-left">-- requests left today</div>
+  </div>
+  <button id="refresh-btn" type="button">Refresh Timing & Recalculate</button>
+  <div class="footer" id="last-updated">Last saved state: Never</div>
+</div>
+<script>
+const DEFAULT_LINE = __LINE__, DEFAULT_DIRECTION = __DIR__, DEFAULT_STOP = __STOP__;
+const LAST_FETCHED = __LAST__;  // last stop refreshed on any device, or null
+const SAVED = 'casabus:last';  // this browser's last line, direction and stop
+const $ = id => document.getElementById(id);
+const make = (tag, props) => Object.assign(document.createElement(tag), props);
+const lineCache = new Map();  // ref -> line data, for instant re-picks
+let line = null, lastUsed = null, lineRequest = null, lineToken = 0;  // only the latest line load may render
+
+function selection() {
+  return { line: $('line-select').value, direction: $('direction-select').value, station: $('station-select').value };
+}
+
+function query() {
+  const s = selection(), e = encodeURIComponent;
+  return `line=${e(s.line)}&direction=${e(s.direction)}&station=${e(s.station)}`;
+}
+
+// Station numbers belong to one direction, so a stop is kept by name across
+// a direction change. Without a match the first stop is selected.
+function fillStations(keepName, keepNo) {
+  const dir = line.directions.find(d => d.key === $('direction-select').value), sel = $('station-select');
+  sel.replaceChildren();
+  dir.stations.forEach(st => { const o = make('option', { value: st.no, textContent: `${st.no}. ${st.name}` }); o.dataset.name = st.name; sel.appendChild(o); });
+  const match = dir.stations.find(st => st.name === keepName) || dir.stations.find(st => String(st.no) === String(keepNo));
+  if (match) sel.value = match.no;
+}
+
+function fillDirections(keep) {
+  const sel = $('direction-select');
+  sel.replaceChildren();
+  line.directions.forEach(d => sel.appendChild(make('option', { value: d.key, textContent: d.label })));
+  if (keep && line.directions.some(d => d.key === keep)) sel.value = keep;
+}
+
+function setStatus(kind, text, action, label = 'Retry') {
+  const box = $('line-status');
+  box.className = 'line-status' + (kind === 'error' ? ' error' : '');
+  box.replaceChildren();
+  if (kind === 'loading') box.appendChild(make('span', { className: 'spinner' }));
+  box.appendChild(make('span', { textContent: text }));
+  if (action) box.appendChild(make('button', { className: 'retry', type: 'button', textContent: label, onclick: action }));
+}
+
+function setLoading(on) {
+  ['direction-select', 'station-select', 'refresh-btn'].forEach(id => $(id).disabled = on);
+  $('results').classList.toggle('dim', on);
+}
+
+function describe(d) {
+  return d.directions.map(x => `${x.stop_count} stops`).join(' / ') + (d.directions.length === 1 ? ' (one direction)' : '');
+}
+
+function showLine(data, keepDirection, keepName, keepNo) {
+  line = data;
+  fillDirections(keepDirection);
+  fillStations(keepName, keepNo);
+  setStatus('ok', describe(data));
+  setLoading(false);
+}
+
+// Loads both directions of a line in one request. A newer pick cancels an
+// older one, so a slow answer never overwrites the line on screen.
+async function loadLine(ref, keepDirection, keepName, keepNo) {
+  const token = ++lineToken;
+  if (lineRequest) lineRequest.abort();
+  if (lineCache.has(ref)) { showLine(lineCache.get(ref), keepDirection, keepName, keepNo); return true; }
+  lineRequest = new AbortController();
+  setLoading(true);
+  const spin = setTimeout(() => token === lineToken && setStatus('loading', `Loading stops of line ${ref}…`), 150);
+  try {
+    const res = await fetch('/api/line?line=' + encodeURIComponent(ref), { signal: lineRequest.signal });
+    const data = await res.json();
+    if (token !== lineToken) return false;
+    if (!res.ok || data.error) throw new Error(data.error || `Server error ${res.status}`);
+    lineCache.set(ref, data);
+    showLine(data, keepDirection, keepName, keepNo);
+    return true;
+  } catch (e) {
+    if (e.name === 'AbortError' || token !== lineToken) return false;
+    line = null;
+    $('direction-select').replaceChildren();
+    $('station-select').replaceChildren();
+    setStatus('error', e.message === 'Failed to fetch' ? 'No connection to the server.' : e.message, () => pickLine(ref));
+    return false;
+  } finally {
+    clearTimeout(spin);
+  }
+}
+
+async function pickLine(ref) { if (await loadLine(ref)) loadSavedState(); }
+
+function renderUsage(u) {
+  if (!u) return;
+  $('usage-used').innerText = u.used;
+  $('usage-limit').innerText = u.limit;
+  $('usage-left').innerText = `${u.left} request${u.left === 1 ? '' : 's'} left today`;
+  const pct = u.limit ? Math.min(100, u.used / u.limit * 100) : 0, fill = $('usage-fill');
+  fill.style.width = pct + '%';
+  fill.classList.toggle('warn', pct >= 75 && pct < 90);
+  fill.classList.toggle('danger', pct >= 90);
+  if (lastUsed !== null && u.used > lastUsed) {  // pop only when HERE was really called
+    const box = $('usage');
+    box.classList.remove('bump'); void box.offsetWidth; box.classList.add('bump');
+  }
+  lastUsed = u.used;
+}
+
+function renderData(d) {
+  // Stop names are data: insert them as text, never as HTML.
+  $('route-info').replaceChildren(make('strong', { textContent: 'From:' }), ` ${d.origin} → `, make('strong', { textContent: 'To:' }), ` ${d.destination_stop}`);
+  $('eta-time').innerText = d.nearest_bus.eta_time_only;
+  $('main-dep-info').innerText = `Departure: ${d.nearest_bus.dep_time_only} | Arrives in: ${d.nearest_bus.arrives_in_minutes} min`;
+  $('prev-eta').innerText = d.previous_bus.eta_time_only;
+  $('prev-dep').innerText = `Departure: ${d.previous_bus.dep_time_only}`;
+  $('next-eta').innerText = d.next_bus.eta_time_only;
+  $('next-dep').innerText = `Departure: ${d.next_bus.dep_time_only}`;
+  const note = $('timetable-note');
+  note.style.display = d.timetable_estimated ? '' : 'none';
+  note.innerText = d.timetable_estimated ? `Timetable unknown: buses assumed every ${d.headway_minutes} min.` : '';
+  $('last-updated').innerText = 'Last updated in memory: ' + d.query_timestamp;
+}
+
+async function loadSavedState() {
+  if (!line) return;
+  const q = query();
+  try {
+    const res = await fetch('/api/state?' + q), data = await res.json();
+    if (q !== query()) return;  // selection changed meanwhile
+    if (data.error) return setStatus('error', data.error, () => pickLine(selection().line));
+    renderData(data);
+    $('status-badge').innerText = 'Saved State Memory';
+    remember();
+  } catch (e) { console.error('Failed to load saved state memory:', e); }
+}
+
+async function refreshData() {
+  if (!line) return;
+  try {
+    $('status-badge').innerText = 'Recalculating...';
+    const res = await fetch('/api/refresh?' + query(), { method: 'POST', headers: { 'X-Casabus': '1' } }), data = await res.json();
+    if (data.error) return alert(data.error);
+    renderData(data);
+    renderUsage(data.usage);
+    remember();
+    $('status-badge').innerText = 'Refreshed Memory';
+  } catch (e) { console.error('Failed to refresh data:', e); }
+}
+
+// Browser storage can be missing or blocked: then the defaults are used.
+function remember() {
+  const s = selection(), opt = $('station-select').selectedOptions[0];
+  try { localStorage.setItem(SAVED, JSON.stringify({ line: s.line, direction: s.direction, stop: opt ? opt.dataset.name : '' })); } catch (e) {}
+}
+
+function lastChoice(lines) {
+  try {
+    const c = JSON.parse(localStorage.getItem(SAVED));
+    if (c && lines.includes(c.line)) return c;
+  } catch (e) {}
+  if (LAST_FETCHED && lines.includes(LAST_FETCHED.line)) return LAST_FETCHED;
+  return { line: DEFAULT_LINE, direction: DEFAULT_DIRECTION, stop: DEFAULT_STOP };
+}
+
+async function initLine() {
+  const lsel = $('line-select');
+  $('refresh-btn').addEventListener('click', refreshData);
+  let lines;
+  try { lines = (await (await fetch('/api/lines')).json()).lines; }
+  catch (e) { return setStatus('error', 'No connection to the server.', () => location.reload()); }
+  lines.forEach(ref => lsel.appendChild(make('option', { value: ref, textContent: 'Line ' + ref })));
+  const start = lastChoice(lines);
+  lsel.value = start.line;
+  lsel.addEventListener('change', () => pickLine(lsel.value));
+  $('direction-select').addEventListener('change', () => {
+    if (!line) return;
+    const cur = $('station-select').selectedOptions[0];
+    fillStations(cur ? cur.dataset.name : null, null);
+    loadSavedState();
+  });
+  $('station-select').addEventListener('change', loadSavedState);
+  if (await loadLine(start.line, start.direction, start.stop, null)) loadSavedState();
+  try { renderUsage(await (await fetch('/api/usage')).json()); }
+  catch (e) { console.error('Failed to load request counter:', e); }
+}
+
+initLine();
+</script>
+</body>
+</html>

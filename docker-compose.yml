@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  casabus-app:
+    build:
+    container_name: casabus-app
+    environment:
+      - HERE_API_KEY=
+    restart: unless-stopped
+    networks:
+      - tailnet
+
+  tailscale:
+    image: tailscale/tailscale:latest
+    container_name: casabus-tailscale-sidecar
+    hostname: casabus-bus
+    environment:
+      - TS_AUTHKEY=
+      - TS_STATE_DIR=/var/lib/tailscale
+    volumes:
+      - casabus-tailscale-var:/var/lib/tailscale
+      - /dev/net/tun:/dev/net/tun
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
+    restart: unless-stopped
+    networks:
+      - tailnet
+    command: >
+      sh -c '
+        tailscaled &
+        until tailscale up --authkey=$$TS_AUTHKEY --hostname=casabus-bus; do
+          sleep 2
+        done
+        echo "Tailscale connected! Configuring automated HTTPS..."
+        tailscale serve --bg --https=443 http://casabus-app:5000
+        sleep infinity
+      '
+
+volumes:
+  casabus-tailscale-var:
+
+networks:
+  tailnet:
+    driver: bridge
