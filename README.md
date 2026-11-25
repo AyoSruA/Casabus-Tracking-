@@ -31,6 +31,13 @@ If you run into a problem, feel free to contact me by opening an issue on this r
 
 The key is optional. Without it, times are estimated only.
 
+    # It runs on docker locally
+    cd ~/Casabus-Tracking--main
+    sudo docker build -t casabus-tracker:latest .
+    sudo docker run -d -p host_port:your_port casabus-tracker:latest
+
+Replace `host_port` with the port you want to open on your machine, and `your_port` with the port the app listens on inside the container.
+
 ## Deploy
 
 `docker-compose.yml` runs the app with a Tailscale sidecar. It ships with empty `HERE_API_KEY=` and `TS_AUTHKEY=`. Fill them in on your server only, and never commit them.
